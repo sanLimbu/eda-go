@@ -6,6 +6,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sanLimbu/eda-go/internal/rpc"
+	"github.com/sanLimbu/eda-go/internal/web"
 	"github.com/stackus/dotenv"
 )
 
@@ -24,12 +25,12 @@ type (
 		ExporterEndpoint string `envconfig:"EXPORTER_OTLP_ENDPOINT" default:"http://collector:4317"`
 	}
 	AppConfig struct {
-		Environment string
-		LogLevel    string `envconfig:"LOG_LEVEL" default:"DEBUG"`
-		PG          PGConfig
-		Nats        NatsConfig
-		Rpc         rpc.RpcConfig
-		//Web             web.WebConfig
+		Environment     string
+		LogLevel        string `envconfig:"LOG_LEVEL" default:"DEBUG"`
+		PG              PGConfig
+		Nats            NatsConfig
+		Rpc             rpc.RpcConfig
+		Web             web.WebConfig
 		Otel            OtelConfig
 		ShutdownTimeout time.Duration `envconfig:"SHUTDOWN_TIMEOUT" default:"30s"`
 	}
