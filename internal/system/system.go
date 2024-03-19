@@ -5,7 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"io/fs"
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -180,6 +182,64 @@ func (s *System) WaitForWeb(ctx context.Context) error {
 	})
 	return group.Wait()
 
+}
+
+func (s *System) WaitForStream(ctx context.Context) error {
+
+	closed := make(chan struct{})
+	s.nc.SetClosedHandler(func(*nats.Conn) {
+		close(closed)
+	})
+
+	group, gCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		fmt.Println("message stream started")
+		defer fmt.Println("message stream stopped")
+		<-closed
+		return nil
+	})
+
+	group.Go(func() error {
+		<-gCtx.Done()
+		return s.nc.Drain()
+	})
+	return group.Wait()
+
+}
+
+func (s *System) WaitForRPC(ctx context.Context) error {
+	listener, err := net.Listen("tcp", s.cfg.Rpc.Address())
+	if err != nil {
+		return err
+	}
+	group, gCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		fmt.Println("rpc server started")
+		defer fmt.Println("rpc server shutdown")
+		if err := s.RPC().Serve(listener); err != nil && err != grpc.ErrServerStopped {
+			return err
+		}
+		return nil
+	})
+	group.Go(func() error {
+		<-gCtx.Done()
+		fmt.Println("rpc server to be shutdown")
+		stopped := make(chan struct{})
+		go func() {
+			s.RPC().GracefulStop()
+			close(stopped)
+		}()
+		timeout := time.NewTimer(s.cfg.ShutdownTimeout)
+		select {
+		case <-timeout.C:
+			//Force it to stop
+			s.RPC().Stop()
+			return fmt.Errorf("rpc server failed to stop gracefully")
+		case <-stopped:
+			return nil
+		}
+	})
+	return group.Wait()
 }
 
 func serverErrorUnaryInterceptor() grpc.UnaryServerInterceptor {
