@@ -24,6 +24,7 @@ type (
 		ID() string
 		ReplyName() string
 		Payload() ReplyPayload
+		Metadata() Metadata
 		OccurredAt() time.Time
 	}
 	reply struct {
