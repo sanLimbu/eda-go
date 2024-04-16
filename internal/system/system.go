@@ -17,6 +17,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/sanLimbu/eda-go/internal/config"
 	"github.com/sanLimbu/eda-go/internal/logger"
+	"github.com/sanLimbu/eda-go/internal/waiter"
 	"github.com/stackus/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -26,13 +27,13 @@ import (
 )
 
 type System struct {
-	cfg config.AppConfig
-	db  *sql.DB
-	nc  *nats.Conn
-	js  nats.JetStreamContext
-	mux *chi.Mux
-	rpc *grpc.Server
-	//waiter waiter.Waiter
+	cfg    config.AppConfig
+	db     *sql.DB
+	nc     *nats.Conn
+	js     nats.JetStreamContext
+	mux    *chi.Mux
+	rpc    *grpc.Server
+	waiter waiter.Waiter
 	logger zerolog.Logger
 	tp     *sdktrace.TracerProvider
 }
@@ -146,13 +147,13 @@ func (s *System) RPC() *grpc.Server {
 	return s.rpc
 }
 
-// func (s *System) initWaiter() {
-// 	s.waiter = waiter.New(waiter.CatchSignals())
-// }
+func (s *System) initWaiter() {
+	s.waiter = waiter.New(waiter.CatchSignals())
+}
 
-// func (s *System) Waiter() waiter.Waiter {
-// 	return s.waiter
-// }
+func (s *System) Waiter() waiter.Waiter {
+	return s.waiter
+}
 
 func (s *System) WaitForWeb(ctx context.Context) error {
 	webServer := &http.Server{

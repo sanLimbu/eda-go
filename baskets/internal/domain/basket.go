@@ -2,6 +2,7 @@ package domain
 
 import (
 	"github.com/sanLimbu/eda-go/internal/ddd"
+	"github.com/sanLimbu/eda-go/internal/es"
 	"github.com/stackus/errors"
 )
 
@@ -18,6 +19,7 @@ var (
 )
 
 type Basket struct {
+	es.Aggregate
 	CustomerID string
 	PaymentID  string
 	Items      map[string]Item
@@ -152,5 +154,31 @@ func (b *Basket) ApplyEvent(event ddd.Event) error {
 
 	default:
 		return errors.ErrInternal.Msgf("%T received the event %s with unexpected payload %T", b, event.EventName(), payload)
+	}
+	return nil
+}
+
+func (b *Basket) ApplySnapshot(snapshot es.Snapshot) error {
+
+	switch ss := snapshot.(type) {
+	case *BasketV1:
+		b.CustomerID = ss.CustomerID
+		b.PaymentID = ss.PaymentID
+		b.Items = ss.Items
+		b.Status = ss.Status
+
+	default:
+		return errors.ErrInternal.Msgf("%T received the unexpected snapshot %T", b, snapshot)
+	}
+	return nil
+
+}
+
+func (b *Basket) ToSnapshot() es.Snapshot {
+	return &BasketV1{
+		CustomerID: b.CustomerID,
+		PaymentID:  b.PaymentID,
+		Items:      b.Items,
+		Status:     b.Status,
 	}
 }
