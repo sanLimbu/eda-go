@@ -4,5 +4,5 @@ type Product struct {
 	ID      string
 	StoreID string
 	Name    string
-	Price   int64
+	Price   float64
 }

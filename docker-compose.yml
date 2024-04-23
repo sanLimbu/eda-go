@@ -135,15 +135,15 @@ services:
       - ./docker/prometheus/prometheus-config.yml:/etc/prometheus/prometheus-config.yml
     ports:
       - "9090:9090"
-  grafana:
-    container_name: grafana
-    hostname: grafana
-    image: grafana/grafana:9.0.9
-    volumes:
-      - ./docker/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./docker/grafana/provisioning/:/etc/grafana/provisioning/
-    ports:
-      - "3000:3000"
+  # grafana:
+  #   container_name: grafana
+  #   hostname: grafana
+  #   image: grafana/grafana:9.0.9
+  #   volumes:
+  #     - ./docker/grafana/grafana.ini:/etc/grafana/grafana.ini
+  #     - ./docker/grafana/provisioning/:/etc/grafana/provisioning/
+  #   ports:
+  #     - "3000:3000"
 
 volumes:
   pgdata:

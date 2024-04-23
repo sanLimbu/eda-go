@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/go-chi/chi/v5"
@@ -19,4 +20,8 @@ type Service interface {
 	RPC() *grpc.Server
 	Waiter() waiter.Waiter
 	Logger() zerolog.Logger
+}
+
+type Module interface {
+	Startup(context.Context, Service) error
 }

@@ -1,5 +1,11 @@
 package domain
 
+import (
+	"github.com/sanLimbu/eda-go/internal/es"
+	"github.com/sanLimbu/eda-go/internal/registry"
+	"github.com/sanLimbu/eda-go/internal/registry/serdes"
+)
+
 const (
 	BasketStartedEvent     = "baskets.BasketStarted"
 	BasketItemAddedEvent   = "baskets.BasketItemAdded"
@@ -8,41 +14,41 @@ const (
 	BasketCheckedOutEvent  = "baskets.BasketCheckedOut"
 )
 
-// func Registrations(reg registry.Registry) error {
-// 	serde := serdes.NewJsonSerde(reg)
+func Registrations(reg registry.Registry) error {
+	serde := serdes.NewJsonSerde(reg)
 
-// 	// Basket
-// 	if err := serde.Register(Basket{}, func(v interface{}) error {
-// 		basket := v.(*Basket)
-// 		basket.Aggregate = es.NewAggregate("", BasketAggregate)
-// 		basket.Items = make(map[string]Item)
-// 		return nil
-// 	}); err != nil {
-// 		return err
-// 	}
-// 	// basket events
-// 	if err := serde.Register(BasketStarted{}); err != nil {
-// 		return err
-// 	}
-// 	if err := serde.Register(BasketCanceled{}); err != nil {
-// 		return err
-// 	}
-// 	if err := serde.Register(BasketCheckedOut{}); err != nil {
-// 		return err
-// 	}
-// 	if err := serde.Register(BasketItemAdded{}); err != nil {
-// 		return err
-// 	}
-// 	if err := serde.Register(BasketItemRemoved{}); err != nil {
-// 		return err
-// 	}
-// 	// basket snapshots
-// 	if err := serde.RegisterKey(BasketV1{}.SnapshotName(), BasketV1{}); err != nil {
-// 		return err
-// 	}
+	// Basket
+	if err := serde.Register(Basket{}, func(v interface{}) error {
+		basket := v.(*Basket)
+		basket.Aggregate = es.NewAggregate("", BasketAggregate)
+		basket.Items = make(map[string]Item)
+		return nil
+	}); err != nil {
+		return err
+	}
+	// basket events
+	if err := serde.Register(BasketStarted{}); err != nil {
+		return err
+	}
+	if err := serde.Register(BasketCanceled{}); err != nil {
+		return err
+	}
+	if err := serde.Register(BasketCheckedOut{}); err != nil {
+		return err
+	}
+	if err := serde.Register(BasketItemAdded{}); err != nil {
+		return err
+	}
+	if err := serde.Register(BasketItemRemoved{}); err != nil {
+		return err
+	}
+	// basket snapshots
+	if err := serde.RegisterKey(BasketV1{}.SnapshotName(), BasketV1{}); err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}
 
 func (Basket) Key() string { return BasketAggregate }
 
