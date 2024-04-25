@@ -7,6 +7,7 @@ import (
 	"github.com/stackus/errors"
 
 	"github.com/sanLimbu/eda-go/baskets/internal/domain"
+	"github.com/sanLimbu/eda-go/stores/storespb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
