@@ -32,7 +32,7 @@ type Module struct {
 }
 
 func (m *Module) Startup(ctx context.Context, mono system.Service) (err error) {
-
+	return Root(ctx, mono)
 }
 
 func Root(ctx context.Context, svc system.Service) (err error) {
@@ -184,11 +184,11 @@ func registrations(reg registry.Registry) (err error) {
 	if err = serde.Register(domain.StoreCreated{}); err != nil {
 		return
 	}
-	if err = serde.RegisterKey(domain.StoreParticipationEnabledEvent, domain.StoreParticipationToggled()); err != nil {
+	if err = serde.RegisterKey(domain.StoreParticipationEnabledEvent, domain.StoreParticipationToggled{}); err != nil {
 		return
 	}
 
-	if err = serde.RegisterKey(domain.StoreParticipationDisabledEvent, domain.StoreParticipationToggled()); err != nil {
+	if err = serde.RegisterKey(domain.StoreParticipationDisabledEvent, domain.StoreParticipationToggled{}); err != nil {
 		return
 	}
 

@@ -32,4 +32,4 @@ build-monolith:
 build-services:
 	docker build -t mallbots-baskets --file docker/Dockerfile.microservices --build-arg=service=baskets .
 	docker build -t mallbots-customers --file docker/Dockerfile.microservices --build-arg=service=customers .
-
+	docker build -t mallbots-stores --file docker/Dockerfile.microservices --build-arg=service=stores .
