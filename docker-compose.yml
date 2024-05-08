@@ -1,28 +1,6 @@
 version: "3.8"
 
-services:
-  #
-  # docker compose--profile monolith up
-  #
-  monolith:
-    container_name: monolith
-    hostname: monolith
-    image: mallbots-monolith
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    ports:
-      - '8080:8080'
-      - '8085:8085'
-    env_file:
-      - docker/.env
-    depends_on:
-      - nats
-      - postgres
-      - collector
-    command: [ "./wait-for", "postgres:5432", "--", "/mallbots/monolith" ]
-    profiles: [ monolith ]
-
+services: 
   #
   # docker compose--profile microservices up
   #
@@ -50,6 +28,56 @@ services:
       - collector
     command: [ "./wait-for", "postgres:5432", "--", "/mallbots/service" ]
     profiles: [ microservices ]
+  customers:
+    container_name: customers
+    hostname: customers
+    image: mallbots-customers
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.microservices
+      args:
+        service: customers
+    expose:
+      - '9000'
+    environment:
+      ENVIRONMENT: development
+      RPC_SERVICES: 'STORES=stores:9000,CUSTOMERS=customers:9000'
+      PG_CONN: host=postgres dbname=customers user=customers_user password=customers_pass search_path=customers,public
+      NATS_URL: nats:4222
+      OTEL_SERVICE_NAME: customers
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+    depends_on:
+      - nats
+      - postgres
+      - collector
+    command: [ "./wait-for", "postgres:5432", "--", "/mallbots/service" ]
+    profiles:
+      - microservices  
+  stores:
+    container_name: stores
+    hostname: stores
+    image: mallbots-stores
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.microservices
+      args:
+        service: stores
+    expose:
+      - '9000'
+    environment:
+      ENVIRONMENT: development
+      RPC_SERVICES: 'STORES=stores:9000,CUSTOMERS=customers:9000'
+      PG_CONN: host=postgres dbname=stores user=stores_user password=stores_pass search_path=stores,public
+      NATS_URL: nats:4222
+      OTEL_SERVICE_NAME: stores
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://collector:4317
+    depends_on:
+      - nats
+      - postgres
+      - collector
+    command: [ "./wait-for", "postgres:5432", "--", "/mallbots/service" ]
+    profiles:
+      - microservices    
 
   reverse-proxy:
     container_name: proxy
