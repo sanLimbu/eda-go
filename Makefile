@@ -15,19 +15,8 @@ generate:
 	@go generate ./...
 	@echo done
 
-build: build-monolith build-services
-
-rebuild: clean-monolith clean-services build
-
-clean-monolith:
-	docker image rm mallbots-monolith
-
 clean-services:
-	docker image rm mallbots-baskets mallbots-customers
-
-
-build-monolith:
-	docker build -t mallbots-monolith --file docker/Dockerfile .
+	docker image rm mallbots-baskets mallbots-customers mallbots-stores
 
 build-services:
 	docker build -t mallbots-baskets --file docker/Dockerfile.microservices --build-arg=service=baskets .

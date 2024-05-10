@@ -2,7 +2,7 @@ version: "3.8"
 
 services: 
   #
-  # docker compose--profile microservices up
+  # docker compose --profile microservices up
   #
   baskets:
     container_name: baskets
